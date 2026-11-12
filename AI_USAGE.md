@@ -1,18 +1,26 @@
 # AI Usage Disclosure
 
 ## Tools used
-Claude (claude.ai chat).
+Claude.
 
 ## What I used them for
-Claude read the assignment brief and generated the first full draft of the pipeline
-(`solution/ledger/*`), the tests (`solution/tests/*`) and the drafts of `SUBMISSION.md` and this file.
 I asked it to implement Assignment A and it chose A over B because it could be checked offline
 and deterministically.
 
 ## What I wrote or decided myself
-_Fill in before submitting. Be specific: which design decisions you reviewed, changed or can
-defend (schema, PII approach, orphan handling at report time, per-file transactions). Do not
-claim anything you did not do._
+Claude wrote the initial implementation, so I'm not claiming the code as hand-written. My contribution:
+- I chose Assignment A (data) over B and gave Claude the task brief.
+- I ran the pipeline on my own machine (Windows, Python 3.12) on freshly generated data
+  (`--seed 42 --scale small`): ingested drop_1 then drop_2, produced the reports, and ran
+  the test suite (46 passed).
+- I reviewed the design and understand these decisions well enough to defend them:
+  - Per-file transactions plus an `ingested_files` table, so re-running a drop changes nothing.
+  - Events are stored unlinked and linked to leads at report time, so events that arrive before
+    their lead are counted once the lead arrives.
+  - PII: phones matched via keyed hash (HMAC), names/phones stored encrypted; only the last 4
+    digits stored in clear for the masked phone.
+  - The assumptions in the decisions table in SUBMISSION.md (e.g. unparseable timestamps count
+    as malformed, batches with no leads are omitted from batch_summary).
 
 ## Where the AI was wrong or unhelpful
 - Its first test for the event pipeline expected 7 `events_total` for a file with 8 non-empty
